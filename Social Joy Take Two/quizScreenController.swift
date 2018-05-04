@@ -8,7 +8,7 @@
 
 
 //Using semaphora so that the JSON Request will go through before setting up Question
-//Need to set Allows Arbitrary Loads in pList to YES -- Important, otherwise code won't work 
+//Need to set Allows Arbitrary Loads in pList to YES -- Important, otherwise code won't work
 
 import MultipeerConnectivity
 import UIKit
@@ -54,6 +54,11 @@ class quizScreenController: UIViewController {
     
     var jsonQuestions: Question!
     var jsonQuestion = [Question]()
+    
+    
+    var questionCount = 0
+    
+    var currentQuestion = 0
     
     
     
@@ -158,36 +163,68 @@ class quizScreenController: UIViewController {
             
             endQuestion()
         }
+        
+        if haveAllPlayersAnswered() == true
+        {
+            endQuestion()
+        }
+        
+        
+        
+        
+    }
+    
+    func haveAllPlayersAnswered() -> Bool
+    {
+        var playerCount = thePlayers.count
+        var i = 0
+        var playersAnswered = 0
+        
+        while i != playerCount
+        {
+            if thePlayers[i].playerAnswer != ""
+            {
+                playersAnswered = playersAnswered + 1
+            }
+            i = i + 1
+        }
+        
+        if playerCount == playersAnswered
+        {
+            return true
+        }
+        else {
+            return false
+        }
+      
     }
     
     func endQuestion()
     {
-        //This is where you would change the questionLabel.text = the answer to the question. Then award points to correct players by changing the playerOneScore.text = playerOneScore (and so on).
-        //Then goToNextQuestion()
+        var correctAnswer = jsonQuestion[currentQuestion].answer
         
-        if currentPlayer.playerAnswer == "A"
+        if currentPlayer.playerAnswer == correctAnswer
         {
-            questionLabel.text = "Correct!"
-            awardPoints(currentPlayer : currentPlayer)
+            questionLabel.text = "Correct! The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
+            awardPoints(currentPlayer: currentPlayer)
             
         }
-        else if currentPlayer.playerAnswer == "B"
+        else if currentPlayer.playerAnswer != correctAnswer
         {
-            questionLabel.text = "Incorrect"
+            questionLabel.text = "Incorrect. The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
         }
         else {
-            questionLabel.text = "Something went wrong :("
+            print("Something went wrong!")
         }
         
-        // setUpQuestion()
+        currentQuestion = currentQuestion + 1
+        goToNextQuestion()
         
     }
     
     func awardPoints(currentPlayer : Player)
     {
-        //If playerAnswer == correctAnswer, chance corresponding player text label to player score + 1
-        //change timer Label to either correct or incorrect
-        
+    
         if currentPlayer.playerNumber == "1"
         {
             playerOneCount = playerOneCount + 1
@@ -196,10 +233,18 @@ class quizScreenController: UIViewController {
         else if currentPlayer.playerNumber == "2"
         {
             playerTwoCount = playerTwoCount + 1
-            player1Score.text = String(playerTwoCount)
+            player2Score.text = String(playerTwoCount)
         }
-        
-        
+        else if currentPlayer.playerAnswer == "3"
+        {
+            playerThreeCount = playerThreeCount + 1
+            player3Score.text = String(playerThreeCount)
+        }
+        else if currentPlayer.playerAnswer == "4"
+        {
+            playerFourCount = playerFourCount + 1
+            player4Score.text = String(playerFourCount)
+        }
         
     }
     
@@ -210,14 +255,19 @@ class quizScreenController: UIViewController {
         //Reset playerAnswer
         //Reset timer to 20 seconds
         //Reset choices background colors all to gray
+        
+        setUpQuestion(number: currentQuestion)
+        currentPlayer.playerAnswer = ""
+        startTimer()
+        
+        choiceA.backgroundColor = UIColor.gray
+        choiceB.backgroundColor = UIColor.gray
+        choiceC.backgroundColor = UIColor.gray
+        choiceD.backgroundColor = UIColor.gray
+
+        
     }
-    //
-    //    func setUpQuestion()
-    //    {
-    //        questionLabel.text = jsonQuestion[0].question
-    //    }
-    //
-    //
+
     func setUpQuestion(number : Int)
     {
         questionLabel.text = jsonQuestion[number].question
@@ -226,13 +276,10 @@ class quizScreenController: UIViewController {
         choiceC.setTitle(jsonQuestion[number].choices["C"], for: .normal)
         choiceD.setTitle(jsonQuestion[number].choices["D"], for: .normal)
         
-        
-        
-        
-        
-        //        choiceA.setTitle(jsonQuestion[0].choices)
-        //        button.setTitle("my text here", for: .normal)
-        
+        if currentQuestion != 0
+        {
+        currentQuestion = currentQuestion + 1
+        }
         
     }
     
@@ -248,7 +295,8 @@ class quizScreenController: UIViewController {
         
         
         setUpQuestion(number: 0)
-        //questionLabel.text = jsonQuestion[0].question
+        
+        startTimer()
         
         
         
@@ -256,10 +304,7 @@ class quizScreenController: UIViewController {
         
         peerID = MCPeerID(displayName: UIDevice.current.name)
         
-        
-        //The currentPlayer is the peerID that is equal to an object in thePlayers
-        //Throwing SIGBAT error because if theres only 2 players, there no thePlayers object data at 2 or 3 (3 or 4 players)
-        //Could fix by
+     
         
         if peerID.displayName == thePlayers[0].peerID
         {
@@ -269,65 +314,25 @@ class quizScreenController: UIViewController {
         {
             currentPlayer = thePlayers[1]
         }
-        //        else if thePlayers.count >= 2 && peerID == thePlayers[2].peerID
-        //        {
-        //            currentPlayer = thePlayers[2]
-        //        }
-        //        else if thePlayers.count >= 3 && peerID == thePlayers[3].peerID
-        //        {
-        //            currentPlayer = thePlayers[3]
-        //        }
+        else if thePlayers.count >= 2 && peerID.displayName == thePlayers[2].peerID
+        {
+            currentPlayer = thePlayers[2]
+        }
+        else if thePlayers.count >= 3 && peerID.displayName == thePlayers[3].peerID
+        {
+            currentPlayer = thePlayers[3]
+        }
         
         
-        //startTimer()
-        
-        // Do any additional setup after loading the view.
+
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    //    let url = URL(string: urlString)
-    //
-    //    let session = URLSession.shared
-    //
-    //    let task = session.dataTask(with: url!, completionHandler: {(data,respose, error) in
-    //
-    //        if let result = data{
-    //            print("inside get JSON")
-    //            do{
-    //                let json = try JSONSerialization.jsonObject(with: result, options: .allowFragments)
-    //
-    //                if let dictionary = json as? [String:Any]{
-    //                    self.numQuestions = dictionary["numberOfQuestions"] as! Int
-    //                    self.topic = dictionary["topic"] as! String
-    //
-    //                    let questions = dictionary["questions"] as! [Any]
-    //                    questions.forEach({ (question) in
-    //                        let q: [String:Any] = question as! [String : Any]
-    //                        self.number = q["number"] as! Int
-    //                        self.question = q["questionSentence"] as! String
-    //                        self.answer = q["correctOption"] as! String
-    //                        self.options = q["options"]  as! [String:String]
-    //                        var optionsForAnswers = [String:String]()
-    //                        self.options.forEach({ (key,option) in //change to map
-    //                            optionsForAnswers[key] = option
-    //                        })
-    //                        self.jsonQuestion.append(Question(number: self.number, question: self.question, options: optionsForAnswers, correctOption: self.answer))
-    //                    })
-    //
-    //                    self.semaphore.signal()
-    //                }
-    //            }
-    //            catch{
-    //                print("json file must not exist", urlString)
-    //                self.semaphore.signal()
-    //            }
-    //        }
-    //
-    //    })
-    //    task.resume()
+
+    
     
     func loadJSON()-> [Question]    {
         var jsonURL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json"
@@ -374,7 +379,6 @@ class quizScreenController: UIViewController {
         
         
         return jsonQuestion
-        //return jsonQuestion
     }
     
     
