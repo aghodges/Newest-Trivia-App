@@ -34,16 +34,9 @@ class quizScreenController: UIViewController {
     var timerIsRunning = false
     var seconds = 20
     
+    var playerPosition = Int()
     
-    //    var nextQuizNumber = 0
-    //    var jsonQuestions:Question!
-    //    var topic = ""
-    //    var jsonQuestion = [Question]()
-    //    var number = 0
-    //    var numQuestions = 0
-    //    var question = ""
-    //    var answer = ""
-    //    var options = [String:String]()
+ 
     //
     var numberOfQuestions = 0
     var questionTopic = ""
@@ -60,21 +53,7 @@ class quizScreenController: UIViewController {
     
     var currentQuestion = 0
     
-    
-    
-    
-    
-    //    @IBOutlet weak var questionLabel: UILabel!
-    //
-    //    @IBOutlet weak var choiceA: UIButton!
-    //    @IBOutlet weak var choiceB: UIButton!
-    //    @IBOutlet weak var choiceC: UIButton!
-    //    @IBOutlet weak var choiceD: UIButton!
-    //
-    //    @IBOutlet weak var playerOneScore: UILabel!
-    //    @IBOutlet weak var playerTwoScore: UILabel!
-    //    @IBOutlet weak var playerThreeScore: UILabel!
-    //    @IBOutlet weak var playerFourScore: UILabel!
+
     
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var choiceA: UIButton!
@@ -102,8 +81,12 @@ class quizScreenController: UIViewController {
         choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "A"
-        changePlayerAnswer(answer: "A")
+        thePlayers[playerPosition].playerAnswer = "A"
+        
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
+        print(thePlayers[0].playerAnswer)
+        print(thePlayers[1].playerAnswer)
+
     }
     
     
@@ -114,8 +97,11 @@ class quizScreenController: UIViewController {
         choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "B"
-        changePlayerAnswer(answer: "B")
+        thePlayers[playerPosition].playerAnswer = "B"
+
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
+        print(thePlayers[0].playerAnswer)
+        print(thePlayers[1].playerAnswer)
         
         
     }
@@ -129,7 +115,9 @@ class quizScreenController: UIViewController {
         choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "C"
-        changePlayerAnswer(answer: "C")
+        thePlayers[playerPosition].playerAnswer = "C"
+
+        
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
         
         
@@ -142,7 +130,8 @@ class quizScreenController: UIViewController {
         choiceC.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "D"
-        changePlayerAnswer(answer: "D")
+        thePlayers[playerPosition].playerAnswer = "D"
+
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
         
         
@@ -168,81 +157,139 @@ class quizScreenController: UIViewController {
             endQuestion()
         }
         
-        if haveAllPlayersAnswered() == true
-        {
-            endQuestion()
-        }
+        checkPlayer()
         
-        
-    }
-    
-    func changePlayerAnswer(answer : String)
-    {
-        var i = 0
-        var playerCount = thePlayers.count
-        
-        while i != playerCount
-        {
-            if currentPlayer.playerNumber == thePlayers[i].playerNumber
-            {
-                thePlayers[i].playerAnswer = answer
-            }
-         i = i + 1
-        }
-        
-        
-        
-    }
-    
-    
-    
-    func haveAllPlayersAnswered() -> Bool
-    {
-        var playerCount = thePlayers.count
-        var i = 0
-        var playersAnswered = 0
-        
-        while i != playerCount
-        {
-            if thePlayers[i].playerAnswer != ""
-            {
-                playersAnswered = playersAnswered + 1
-            }
-            i = i + 1
-        }
-        
-        if playerCount == playersAnswered
-        {
-            return true
-        }
-        else {
-            return false
-        }
       
+        
+        
     }
+    
+    func checkPlayer()
+    {
+        for (_, player) in thePlayers.enumerated()
+        {
+            if player.playerAnswer == ""
+            {
+                return
+            }
+            else
+            {
+                endQuestion()
+            }
+        }
+    }
+    
+    func pls()
+    {
+        for (_, player) in thePlayers.enumerated()
+        {
+            if player.playerAnswer == jsonQuestion[currentQuestion].answer
+            {
+                player.updatePoints()
+                relate(relatePlayer: player)
+            }
+            player.playerAnswer = ""
+            
+        }
+    }
+    
+    func relate(relatePlayer : Player)
+    {
+        for(_, player) in thePlayers.enumerated()
+        {
+            if relatePlayer.playerNumber == player.playerNumber
+            {
+                var num = Int(relatePlayer.playerNumber)
+                givePointsToPlayer(num: num!)
+            }
+        }
+    }
+    
+    func givePointsToPlayer(num : Int)
+    {
+        if num == 1
+        {
+            playerOneCount = playerOneCount + 1
+            player2Score.text = String(playerOneCount)
+        }
+        else if num == 2
+        {
+            playerTwoCount = playerTwoCount + 1
+            player2Score.text = String(playerTwoCount)
+        }
+    }
+ 
     
     func endQuestion()
     {
-        var correctAnswer = jsonQuestion[currentQuestion].answer
-        
-        if currentPlayer.playerAnswer == correctAnswer
-        {
-            questionLabel.text = "Correct! The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
-            awardPoints(currentPlayer: currentPlayer)
-            
-        }
-        else if currentPlayer.playerAnswer != correctAnswer
-        {
-            questionLabel.text = "Incorrect. The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
-        }
-        else {
-            print("Something went wrong!")
-        }
+        pls()
+//        let correctAnswer = jsonQuestion[currentQuestion].answer
+//
+//        if currentPlayer.playerAnswer == correctAnswer
+//        {
+//            questionLabel.text = "Correct! The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
+//            awardPoints(currentPlayer: currentPlayer)
+//
+//        }
+//        else if currentPlayer.playerAnswer != correctAnswer
+//        {
+//            questionLabel.text = "Incorrect. The answer was " + jsonQuestion[currentQuestion].choices[correctAnswer]!
+//        }
+//        else {
+//            print("Something went wrong!")
+//        }
         
         currentQuestion = currentQuestion + 1
-        goToNextQuestion()
+       // goToNextQuestion()
         
     }
+    
+    func test()
+    {
+        var i = 0
+        let playerCount = thePlayers.count
+        let correctAnswer = jsonQuestion[currentQuestion].answer
+        
+        while i != playerCount
+        {
+            if thePlayers[i].playerAnswer == correctAnswer
+            {
+                if thePlayers[i].playerNumber == currentPlayer.playerNumber
+                {
+                    updateMePlayerScore()
+                }
+                else
+                {
+                    updateOtherPlayer(i: i)
+                }
+            }
+            
+        }
+    }
+    
+    func updateMePlayerScore()
+    {
+        playerOneCount = playerOneCount + 1
+        player1Score.text = String(playerOneCount)
+    }
+    
+    func updateOtherPlayer(i : Int)
+    {
+        if i == 0
+        {
+            
+        }
+        else if i == 1
+        {
+            
+        }
+        else
+        {
+            print("Something went wrong")
+        }
+    }
+    
+    
     
     func awardPoints(currentPlayer : Player)
     {
@@ -331,19 +378,29 @@ class quizScreenController: UIViewController {
         if peerID.displayName == thePlayers[0].peerID
         {
             currentPlayer = thePlayers[0]
+            playerPosition = 0
         }
         else if thePlayers.count >= 1 && peerID.displayName == thePlayers[1].peerID
         {
             currentPlayer = thePlayers[1]
+            playerPosition = 1
         }
         else if thePlayers.count >= 2 && peerID.displayName == thePlayers[2].peerID
         {
             currentPlayer = thePlayers[2]
+            playerPosition = 2
         }
         else if thePlayers.count >= 3 && peerID.displayName == thePlayers[3].peerID
         {
             currentPlayer = thePlayers[3]
+            playerPosition = 3
         }
+        
+        print(thePlayers[0].peerID)
+        print(thePlayers[1].peerID)
+        print(currentPlayer.peerID)
+        
+        
         
         
 

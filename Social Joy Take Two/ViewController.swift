@@ -13,6 +13,7 @@ import MultipeerConnectivity
 
 //var thePlayers = [MCPeerID]()
 var thePlayers = [Player]()
+var testingValue = 0
 
 
 class mainMenuViewController: UIViewController, MCBrowserViewControllerDelegate,MCSessionDelegate {

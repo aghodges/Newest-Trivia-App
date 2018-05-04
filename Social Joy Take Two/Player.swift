@@ -14,11 +14,17 @@ class Player {
     var peerID : String
     var playerNumber : String
     var playerAnswer = ""
+    var playerScore = 0
     
     init(peerID: String, playerNumber: String)
     {
         self.peerID = peerID
         self.playerNumber = playerNumber
+    }
+    
+    func updatePoints()
+    {
+        playerScore = playerScore + 1
     }
 }
 
