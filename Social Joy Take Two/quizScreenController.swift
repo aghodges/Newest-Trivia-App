@@ -97,22 +97,24 @@ class quizScreenController: UIViewController {
     
     @IBAction func choiceASelect(_ sender: Any) {
         choiceA.backgroundColor = UIColor.blue
-        choiceB.backgroundColor = UIColor.gray
-        choiceC.backgroundColor = UIColor.gray
-        choiceD.backgroundColor = UIColor.gray
+        choiceB.backgroundColor = UIColor.lightGray
+        choiceC.backgroundColor = UIColor.lightGray
+        choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "A"
+        changePlayerAnswer(answer: "A")
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
     }
     
     
     @IBAction func choiceBSelect(_ sender: Any) {
         choiceB.backgroundColor = UIColor.blue
-        choiceA.backgroundColor = UIColor.gray
-        choiceC.backgroundColor = UIColor.gray
-        choiceD.backgroundColor = UIColor.gray
+        choiceA.backgroundColor = UIColor.lightGray
+        choiceC.backgroundColor = UIColor.lightGray
+        choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "B"
+        changePlayerAnswer(answer: "B")
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
         
         
@@ -122,11 +124,12 @@ class quizScreenController: UIViewController {
     
     @IBAction func choiceCSelect(_ sender: Any) {
         choiceC.backgroundColor = UIColor.blue
-        choiceA.backgroundColor = UIColor.gray
-        choiceB.backgroundColor = UIColor.gray
-        choiceD.backgroundColor = UIColor.gray
+        choiceA.backgroundColor = UIColor.lightGray
+        choiceB.backgroundColor = UIColor.lightGray
+        choiceD.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "C"
+        changePlayerAnswer(answer: "C")
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
         
         
@@ -134,11 +137,12 @@ class quizScreenController: UIViewController {
     
     @IBAction func choiceDSelect(_ sender: Any) {
         choiceD.backgroundColor = UIColor.blue
-        choiceA.backgroundColor = UIColor.gray
-        choiceB.backgroundColor = UIColor.gray
-        choiceC.backgroundColor = UIColor.gray
+        choiceA.backgroundColor = UIColor.lightGray
+        choiceB.backgroundColor = UIColor.lightGray
+        choiceC.backgroundColor = UIColor.lightGray
         
         currentPlayer.playerAnswer = "D"
+        changePlayerAnswer(answer: "D")
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
         
         
@@ -170,9 +174,27 @@ class quizScreenController: UIViewController {
         }
         
         
+    }
+    
+    func changePlayerAnswer(answer : String)
+    {
+        var i = 0
+        var playerCount = thePlayers.count
+        
+        while i != playerCount
+        {
+            if currentPlayer.playerNumber == thePlayers[i].playerNumber
+            {
+                thePlayers[i].playerAnswer = answer
+            }
+         i = i + 1
+        }
+        
         
         
     }
+    
+    
     
     func haveAllPlayersAnswered() -> Bool
     {
@@ -260,10 +282,10 @@ class quizScreenController: UIViewController {
         currentPlayer.playerAnswer = ""
         startTimer()
         
-        choiceA.backgroundColor = UIColor.gray
-        choiceB.backgroundColor = UIColor.gray
-        choiceC.backgroundColor = UIColor.gray
-        choiceD.backgroundColor = UIColor.gray
+        choiceA.backgroundColor = UIColor.lightGray
+        choiceB.backgroundColor = UIColor.lightGray
+        choiceC.backgroundColor = UIColor.lightGray
+        choiceD.backgroundColor = UIColor.lightGray
 
         
     }
