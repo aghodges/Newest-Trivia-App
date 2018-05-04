@@ -84,8 +84,16 @@ class quizScreenController: UIViewController {
         thePlayers[playerPosition].playerAnswer = "A"
         
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
-        print(thePlayers[0].playerAnswer)
-        print(thePlayers[1].playerAnswer)
+        
+        
+        do {
+            let data = NSKeyedArchiver.archivedData(withRootObject: currentPlayer.playerAnswer)
+            try self.session?.send(data, toPeers: (self.session?.connectedPeers)!, with: .unreliable)
+        }
+        catch let err{
+            print("Data wasn't sent")
+        }
+    
 
     }
     
@@ -100,8 +108,15 @@ class quizScreenController: UIViewController {
         thePlayers[playerPosition].playerAnswer = "B"
 
         print("current player: " + currentPlayer.peerID + " answered " + currentPlayer.playerAnswer)
-        print(thePlayers[0].playerAnswer)
-        print(thePlayers[1].playerAnswer)
+   
+        
+        do {
+            let data = NSKeyedArchiver.archivedData(withRootObject: currentPlayer.playerAnswer)
+            try self.session?.send(data, toPeers: (self.session?.connectedPeers)!, with: .unreliable)
+        }
+        catch let err{
+            print("Data wasn't sent")
+        }
         
         
     }
@@ -172,38 +187,48 @@ class quizScreenController: UIViewController {
             {
                 return
             }
-            else
-            {
-                endQuestion()
-            }
         }
+        endQuestion()
     }
     
     func pls()
     {
-        for (_, player) in thePlayers.enumerated()
+        for (i, player) in thePlayers.enumerated()
         {
             if player.playerAnswer == jsonQuestion[currentQuestion].answer
             {
-                player.updatePoints()
-                relate(relatePlayer: player)
+                //player.updatePoints()
+                player.playerScore = player.playerScore + 1
+                //relate(relatePlayer: player)
             }
-            player.playerAnswer = ""
-            
+            //player.playerAnswer = ""
+
         }
+        givePoints()
+    
+        
+       
     }
     
-    func relate(relatePlayer : Player)
+    func givePoints()
     {
-        for(_, player) in thePlayers.enumerated()
-        {
-            if relatePlayer.playerNumber == player.playerNumber
-            {
-                var num = Int(relatePlayer.playerNumber)
-                givePointsToPlayer(num: num!)
-            }
-        }
+        player1Score.text = String(thePlayers[0].playerScore)
+        player2Score.text = String(thePlayers[1].playerScore)
+        
     }
+    
+    
+//    func relate(relatePlayer : Player)
+//    {
+//        for(_, player) in thePlayers.enumerated()
+//        {
+//            if relatePlayer.playerNumber == player.playerNumber
+//            {
+//                var num = Int(relatePlayer.playerNumber)
+//                givePointsToPlayer(num: num!)
+//            }
+//        }
+//    }
     
     func givePointsToPlayer(num : Int)
     {
@@ -223,6 +248,8 @@ class quizScreenController: UIViewController {
     func endQuestion()
     {
         pls()
+        print("Myself has" + String(thePlayers[0].playerScore))
+        print("Other has" + String(thePlayers[1].playerScore))
 //        let correctAnswer = jsonQuestion[currentQuestion].answer
 //
 //        if currentPlayer.playerAnswer == correctAnswer
